@@ -66,8 +66,10 @@ func (b *Bot) handleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
         b.handleScores(s, m)
     case m.Content == "!!trivia end":
         b.handleEnd(s, m)
-    case m.Content == "!!trivia next" && m.Author.ID == b.AdminID: // New command
+    case m.Content == "!!trivia next" && m.Author.ID == b.AdminID:
         b.handleNext(s, m)
+    case m.Content == "!!trivia reset" && m.Author.ID == b.AdminID:
+        b.handleReset(s, m)
     case len(m.Content) > len("!!trivia join ") && m.Content[:13] == "!!trivia join":
         b.handleJoin(s, m)
     case len(m.Content) > len("!!trivia answer ") && m.Content[:15] == "!!trivia answer":
@@ -76,5 +78,9 @@ func (b *Bot) handleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
         b.handleAddQuestion(s, m)
     case len(m.Content) > len("!!trivia removeq ") && m.Content[:16] == "!!trivia removeq" && m.Author.ID == b.AdminID:
         b.handleRemoveQuestion(s, m)
+    case m.Content == "!!trivia list" && m.Author.ID == b.AdminID:
+        b.handleListQuestions(s, m, false)
+    case m.Content == "!!trivia list answers" && m.Author.ID == b.AdminID:
+        b.handleListQuestions(s, m, true)
     }
 }

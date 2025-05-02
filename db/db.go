@@ -110,3 +110,31 @@ func (db *DB) GetScores() ([]Player, []Team, error) {
 
     return playerList, teamList, nil
 }
+
+func (db *DB) ResetScoresAndTeams() error {
+    _, err := db.Exec("DELETE FROM teams")
+    if err != nil {
+        return err
+    }
+    _, err = db.Exec("DELETE FROM players")
+    return err
+}
+
+func (db *DB) ListQuestions() ([]Question, error) {
+    rows, err := db.Query("SELECT id, text, answer FROM questions ORDER BY id")
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var questions []Question
+    for rows.Next() {
+        var q Question
+        if err := rows.Scan(&q.ID, &q.Text, &q.Answer); err != nil {
+            return nil, err
+        }
+        questions = append(questions, q)
+    }
+
+    return questions, nil
+}
