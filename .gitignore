@@ -1,0 +1,16 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Environment files
+.env
+
+# Database
+trivia.db
+
+# Build artifacts
+/bin/
+/pkg/
