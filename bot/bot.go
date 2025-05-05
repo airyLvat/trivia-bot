@@ -13,6 +13,33 @@ type Bot struct {
     DB        *db.DB
     Trivia    *Trivia
     AdminID   string
+    AdminRoleID string
+}
+
+func (b *Bot) isAdmin(s *discordgo.Session, m *discordgo.MessageCreate) bool {
+    // Check if the user is the hardcoded admin
+    if m.Author.ID == b.AdminID {
+        return true
+    }
+
+    // Check if the user has the admin role
+    if b.AdminRoleID == "" {
+        return false // No admin role configured
+    }
+
+    member, err := s.GuildMember(m.GuildID, m.Author.ID)
+    if err != nil {
+        log.Printf("Error fetching member roles: %v", err)
+        return false
+    }
+
+    for _, roleID := range member.Roles {
+        if roleID == b.AdminRoleID {
+            return true
+        }
+    }
+
+    return false
 }
 
 func NewBot() (*Bot, error) {
@@ -22,6 +49,7 @@ func NewBot() (*Bot, error) {
 
     token := os.Getenv("DISCORD_TOKEN")
     adminID := os.Getenv("ADMIN_ID")
+    adminRoleID := os.Getenv("ADMIN_ROLE_ID")
 
     session, err := discordgo.New("Bot " + token)
     if err != nil {
@@ -38,6 +66,7 @@ func NewBot() (*Bot, error) {
         DB:      db,
         Trivia:  NewTrivia(),
         AdminID: adminID,
+        AdminRoleID: adminRoleID,
     }
 
     session.AddHandler(bot.handleMessage)
@@ -49,6 +78,9 @@ func (b *Bot) Start() error {
         return err
     }
     log.Println("Bot is running...")
+    log.Printf("Logged in as: %s#%s\n", b.Session.State.User.Username, b.Session.State.User.Discriminator)
+    log.Printf("Admin ID: %s\n", b.AdminID)
+    log.Printf("Admin Role ID: %s\n", b.AdminRoleID)
     return nil
 }
 
@@ -58,29 +90,29 @@ func (b *Bot) handleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
     }
 
     switch {
-    case m.Content == "!!trivia start":
+    case m.Content == "!!trivia start" && b.isAdmin(s, m):
         b.handleStart(s, m)
     case m.Content == "!!trivia help":
         b.handleHelp(s, m)
     case m.Content == "!!trivia scores":
         b.handleScores(s, m)
-    case m.Content == "!!trivia end":
+    case m.Content == "!!trivia end" && b.isAdmin(s, m):
         b.handleEnd(s, m)
-    case m.Content == "!!trivia next" && m.Author.ID == b.AdminID:
+    case m.Content == "!!trivia next" && b.isAdmin(s, m):
         b.handleNext(s, m)
-    case m.Content == "!!trivia reset" && m.Author.ID == b.AdminID:
+    case m.Content == "!!trivia reset" && b.isAdmin(s, m):
         b.handleReset(s, m)
     case len(m.Content) > len("!!trivia join ") && m.Content[:13] == "!!trivia join":
         b.handleJoin(s, m)
     case len(m.Content) > len("!!trivia answer ") && m.Content[:15] == "!!trivia answer":
         b.handleAnswer(s, m)
-    case len(m.Content) > len("!!trivia addq ") && m.Content[:13] == "!!trivia addq" && m.Author.ID == b.AdminID:
+    case len(m.Content) > len("!!trivia addq ") && m.Content[:13] == "!!trivia addq" && b.isAdmin(s, m):
         b.handleAddQuestion(s, m)
-    case len(m.Content) > len("!!trivia removeq ") && m.Content[:16] == "!!trivia removeq" && m.Author.ID == b.AdminID:
+    case len(m.Content) > len("!!trivia removeq ") && m.Content[:16] == "!!trivia removeq" && b.isAdmin(s, m):
         b.handleRemoveQuestion(s, m)
-    case m.Content == "!!trivia list" && m.Author.ID == b.AdminID:
+    case m.Content == "!!trivia list" && b.isAdmin(s, m):
         b.handleListQuestions(s, m, false)
-    case m.Content == "!!trivia list answers" && m.Author.ID == b.AdminID:
+    case m.Content == "!!trivia list answers" && b.isAdmin(s, m):
         b.handleListQuestions(s, m, true)
     }
 }
