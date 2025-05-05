@@ -10,7 +10,6 @@ FROM arm64v8/alpine:3.18
 RUN apk add --no-cache sqlite
 WORKDIR /app
 COPY --from=builder /app/trivia-bot .
-COPY trivia.db /app/data/trivia.db
 COPY .env .
 VOLUME /app/data
 ENV DATABASE_PATH=/app/data/trivia.db
