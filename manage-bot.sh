@@ -3,7 +3,8 @@
 IMAGE_NAME="trivia-bot"
 CONTAINER_NAME="trivia-bot"
 VOLUME_NAME="trivia-bot-data"
-SOURCE_DB="~/bots/trivia-bot/trivia.db"
+SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+SOURCE_DB="$SCRIPT_DIR/trivia.db"
 CONTAINER_DB_PATH="/app/data/trivia.db"
 
 if [ ! -f "$SOURCE_DB" ]; then
