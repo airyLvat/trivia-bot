@@ -233,15 +233,13 @@ func (b *Bot) handleHelp(s *discordgo.Session, m *discordgo.MessageCreate) {
         "- **!!trivia answer <answer>**: Submit an answer to the current question (case-insensitive, e.g., `France` or `france`). Only the first correct answer earns points.",
         "- **!!trivia scores**: Display individual and team scores.",
         "\n**Admin Commands (restricted to the bot's admin user):**",
-        "- **!!trivia start**: [Admin] Start a new trivia contest.",
-        "- **!!trivia end**: [Admin] End the current trivia contest.",
-        "- **!!trivia next**: [Admin] Trigger the next question.",
-        "- **!!trivia reset**: [Admin] Reset all scores and teams, preserving questions.",
-        "- **!!trivia list**: [Admin] List all questions in the database.",
-        "- **!!trivia addq <question> | <answer>**: [Admin] Add a new question (e.g., `!!trivia addq What is 2+2? | 4`).",
-        "- **!!trivia removeq <id>**: [Admin] Remove a question by ID.",
-        "",
-        "Note: Admin commands are restricted to the bot's admin user.",
+        "- **!!trivia start**: Start a new trivia contest.",
+        "- **!!trivia end**: End the current trivia contest.",
+        "- **!!trivia next**: Trigger the next question.",
+        "- **!!trivia reset**: Reset all scores and teams, preserving questions.",
+        "- **!!trivia list**: List all questions in the database.",
+        "- **!!trivia addq <question> | <answer>**: Add a new question (e.g., `!!trivia addq What is 2+2? | 4`).",
+        "- **!!trivia removeq <id>**: Remove a question by ID.",
     }
     helpMessage := strings.Join(lines, "\n")
 
@@ -281,7 +279,18 @@ func (b *Bot) handleReset(s *discordgo.Session, m *discordgo.MessageCreate) {
     log.Printf("Scores and teams reset by %s\n", m.Author.Username)
 }
 
-func (b *Bot) handleListQuestions(s *discordgo.Session, m *discordgo.MessageCreate, includeAnswer bool) {
+func (b *Bot) handleListQuestions(s *discordgo.Session, m *discordgo.MessageCreate, answerSwitch string) {
+    includeAnswer := false
+
+    switch answerSwitch {
+    case "noanswers":
+        includeAnswer = false
+    case "answers":
+        includeAnswer = true
+    case "count":
+        includeAnswer = false
+    }
+        
     questions, err := b.DB.ListQuestions()
     if err != nil {
         s.ChannelMessageSendReply(m.ChannelID, "Error fetching questions.", m.Reference())
@@ -291,6 +300,11 @@ func (b *Bot) handleListQuestions(s *discordgo.Session, m *discordgo.MessageCrea
 
     if len(questions) == 0 {
         s.ChannelMessageSendReply(m.ChannelID, "No questions in the database.", m.Reference())
+        return
+    }
+
+    if answerSwitch == "count" {
+        s.ChannelMessageSendReply(m.ChannelID, fmt.Sprintf("There are %d questions in the database.", len(questions)), m.Reference())
         return
     }
 

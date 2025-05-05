@@ -111,8 +111,10 @@ func (b *Bot) handleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
     case len(m.Content) > len("!!trivia removeq ") && m.Content[:16] == "!!trivia removeq" && b.isAdmin(s, m):
         b.handleRemoveQuestion(s, m)
     case m.Content == "!!trivia list" && b.isAdmin(s, m):
-        b.handleListQuestions(s, m, false)
+        b.handleListQuestions(s, m, "noanswers")
     case m.Content == "!!trivia list answers" && b.isAdmin(s, m):
-        b.handleListQuestions(s, m, true)
+        b.handleListQuestions(s, m, "answers")
+    case m.Content == "!!trivia list count" && b.isAdmin(s, m):
+        b.handleListQuestions(s, m, "count")
     }
 }
