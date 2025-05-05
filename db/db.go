@@ -2,8 +2,11 @@ package db
 
 import (
     "database/sql"
-    _ "github.com/mattn/go-sqlite3"
+    "log"
+    "os"
     "strings"
+
+    _ "github.com/mattn/go-sqlite3"
 )
 
 type DB struct {
@@ -11,7 +14,12 @@ type DB struct {
 }
 
 func NewDB() (*DB, error) {
-    db, err := sql.Open("sqlite3", "./trivia.db")
+    dbPath := os.Getenv("DATABASE_PATH")
+    if dbPath == "" {
+        dbPath = "./trivia.db" // Fallback for local development
+    }
+    log.Printf("Opening database at: %s", dbPath)
+    db, err := sql.Open("sqlite3", dbPath)
     if err != nil {
         return nil, err
     }
