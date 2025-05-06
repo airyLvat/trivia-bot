@@ -27,32 +27,6 @@ func (b *Bot) handleStart(s *discordgo.Session, m *discordgo.MessageCreate) {
     b.Trivia.NextChan <- struct{}{}
 }
 
-// func (b *Bot) runTrivia(s *discordgo.Session, channelID string) {
-//     for b.Trivia.Active {
-//         // Wait for admin to trigger the next question
-//         select {
-//         case <-b.Trivia.NextChan:
-//         case <-time.After(timeoutLength * time.Minute):
-//             s.ChannelMessageSend(channelID, "Trivia timed out due to inactivity. Ending game.")
-//             b.Trivia.End()
-//             log.Println("Trivia timed out due to inactivity. Game ended.")
-//             return
-//         }
-//
-//         q, err := b.DB.GetRandomQuestion()
-//         if err != nil {
-//             s.ChannelMessageSend(channelID, "Error fetching question. Ending trivia.")
-//             log.Println("Error fetching question:", err)
-//             b.Trivia.End()
-//             return
-//         }
-//
-//         b.Trivia.SetQuestion(q)
-//         questionText := strings.TrimSpace(q.Text)
-//         log.Printf("Posting question: %q", questionText)
-//         s.ChannelMessageSend(channelID, fmt.Sprintf("Question: %s\nUse `!!trivia answer <answer>` to respond.", questionText))
-//     }
-// }
 func (b *Bot) runTrivia(s *discordgo.Session, channelID string) {
     for b.Trivia.Active {
         select {
@@ -72,10 +46,11 @@ func (b *Bot) runTrivia(s *discordgo.Session, channelID string) {
 
         b.Trivia.SetQuestion(q)
         questionText := strings.TrimSpace(q.Text)
-        log.Printf("Posting question: %q", questionText)
+        questionNumber := b.Trivia.Current.ID
+        log.Printf("Posting question: %q - %q", questionNumber, questionText)
 
         embed := &discordgo.MessageEmbed{
-            Title:       "Trivia Question",
+            Title:       "Trivia Question # " + strconv.Itoa(questionNumber),
             Description: questionText,
             Color:       0x00ff00, // Green sidebar
             Footer: &discordgo.MessageEmbedFooter{
