@@ -69,7 +69,7 @@ func (b *Bot) runTrivia(s *discordgo.Session, channelID string) {
 }
 
 func (b *Bot) handleJoin(s *discordgo.Session, m *discordgo.MessageCreate) {
-    team := strings.TrimSpace(m.Content[13:])
+    team := strings.ToLower(strings.TrimSpace(m.Content[13:]))
     if team == "" {
         s.ChannelMessageSendReply(m.ChannelID, "Please specify a team name.", m.Reference())
         return

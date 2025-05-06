@@ -67,7 +67,7 @@ func (db *DB) GetRandomQuestion() (*Question, error) {
 }
 
 func (db *DB) JoinTeam(userID, team string) error {
-    team = strings.TrimSpace(team)
+    team = strings.ToLower(strings.TrimSpace(team))
     _, err := db.Exec("INSERT OR REPLACE INTO players (user_id, team, score) VALUES (?, ?, 0)", userID, team)
     if err != nil {
         return err
@@ -77,11 +77,11 @@ func (db *DB) JoinTeam(userID, team string) error {
 }
 
 func (db *DB) AddScore(userID, team string, points int) error {
-    _, err := db.Exec("UPDATE players SET score = score + ? WHERE user_id = ?", points, userID)
+    _, err := db.Exec("UPDATE players SET score = score + ? WHERE user_id = ? ORDER BY score DESC", points, userID)
     if err != nil {
         return err
     }
-    _, err = db.Exec("UPDATE teams SET score = score + ? WHERE name = ?", points, team)
+    _, err = db.Exec("UPDATE teams SET score = score + ? WHERE name = ? ORDER BY score DESC", points, team)
     return err
 }
 
