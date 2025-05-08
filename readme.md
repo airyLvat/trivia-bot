@@ -10,6 +10,7 @@ A Discord bot for running trivia games. Built in Go, it uses SQLite for data sto
 - Admin Controls: Restricted commands for admins (via ID or role) to manage questions and games.
 - Embeds: Rich Discord embeds for questions.
 - Persistence: SQLite database (trivia.db) persists questions and scores across container rebuilds using a bind mount.
+- Channel allow-list: Only allows commands in specified channels (e.g., trivia, games) to prevent spam in other channels.
 
 ## Prerequisites
 
@@ -33,10 +34,12 @@ Create a .env file in the project root with the following contents:
 DISCORD_TOKEN=
 ADMIN_ID=
 ADMIN_ROLE_ID=
+ALLOWED_CHANNELS=
 ```
 - Replace `DISCORD_TOKEN` with your bot token.
 - Set `ADMIN_ID` to your Discord user ID (for admin commands).
 - Set `ADMIN_ROLE_ID` to the role ID of the admin role (for admin commands).
+- Set `ALLOWED_CHANNELS` to a comma-separated list of channel IDs where the bot can respond to commands (e.g., `123456789012345678,234567890123456789`).
 
 ### 3. Set Up the Database
 
