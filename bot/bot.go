@@ -1,11 +1,14 @@
 package bot
 
 import (
-    "github.com/bwmarrin/discordgo"
-    "github.com/joho/godotenv"
     "log"
     "os"
+    "strings"
+
     "github.com/airylvat/trivia-bot/db"
+
+    "github.com/bwmarrin/discordgo"
+    "github.com/joho/godotenv"
 )
 
 type Bot struct {
@@ -86,6 +89,23 @@ func (b *Bot) Start() error {
 
 func (b *Bot) handleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
     if m.Author.ID == s.State.User.ID {
+        return
+    }
+
+    allowedChannels := strings.Split(os.Getenv("ALLOWED_CHANNELS"), ",")
+    if len(allowedChannels) == 0 || allowedChannels[0] == "" {
+        // If no channels are specified, respond in all channels
+        return
+    }
+
+    allowed := false
+    for _, channelID := range allowedChannels {
+        if m.ChannelID == strings.TrimSpace(channelID) {
+            allowed = true
+            break
+        }
+    }
+    if !allowed {
         return
     }
 
