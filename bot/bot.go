@@ -84,6 +84,7 @@ func (b *Bot) Start() error {
     log.Printf("Logged in as: %s#%s\n", b.Session.State.User.Username, b.Session.State.User.Discriminator)
     log.Printf("Admin ID: %s\n", b.AdminID)
     log.Printf("Admin Role ID: %s\n", b.AdminRoleID)
+    log.Printf("Allowed Channels: %s\n", os.Getenv("ALLOWED_CHANNELS"))
     return nil
 }
 
