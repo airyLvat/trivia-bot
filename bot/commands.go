@@ -212,7 +212,9 @@ func (b *Bot) handleHelp(s *discordgo.Session, m *discordgo.MessageCreate) {
         "- **!!trivia end**: End the current trivia contest.",
         "- **!!trivia next**: Trigger the next question.",
         "- **!!trivia reset**: Reset all scores and teams, preserving questions.",
-        "- **!!trivia list**: List all questions in the database.",
+        "- **!!trivia list**: Post how many questiosn are in the database.",
+        "- **!!trivia list questions**: Post all the questions in the database, without answers.",
+        "- **!!trivia list answers**: Post all the questions in the database, with answers.",
         "- **!!trivia addq <question> | <answer>**: Add a new question (e.g., `!!trivia addq What is 2+2? | 4`).",
         "- **!!trivia removeq <id>**: Remove a question by ID.",
     }
@@ -258,7 +260,7 @@ func (b *Bot) handleListQuestions(s *discordgo.Session, m *discordgo.MessageCrea
     includeAnswer := false
 
     switch answerSwitch {
-    case "noanswers":
+    case "questions":
         includeAnswer = false
     case "answers":
         includeAnswer = true

@@ -81,12 +81,15 @@ Run: `sqlite3 ~/trivia-bot/data/trivia.db "SELECT COUNT(*) FROM questions;"`
 ### Commands
 
 - `!!trivia start`: Start a trivia game.
+- `!!trivia answer <your_answer>`: Answer the current question (first correct answer scores points).
 - `!!trivia next`: Get the next question.
 - `!!trivia addq <question> | <answer>`: Add a new question (admin only).
 - `!!trivia scores`: Show the leaderboard with players and teams sorted by score (highest to lowest).
 - `!!trivia addteam <team_name>`: Create a team (case-insensitive, e.g., TeamA, teama).
 - `!!trivia jointeam <team_name>`: Join a team (case-insensitive).
-- `!!trivia list`: List all questions.
+- `!!trivia list`: List how many questions are in the database.
+- `!!trivia list questions`: Write out all the questions, without answers.
+- `!!trivia list answers`: Write out all the questions and their answers.
 
 ### Example
 
